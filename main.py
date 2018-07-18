@@ -9,6 +9,7 @@ from unit_class import *
 from map_class import *
 
 #----------------备忘---------------------
+# This is only a reminder for me about what to add on or what to correct.
 '''
 关于碰撞的两个问题：
 - 撞入墙里
@@ -20,35 +21,35 @@ from map_class import *
 '''
 #--------------------------------------
 
-pygame.init()   # 初始化
+pygame.init()   # initialise
 
-#---------- 全局参数 -----------
+#---------- Important parameters -----------
 g = 1000
 #------------------------------
 
-#---------- 字体设置 -----------
+#---------- Font -----------
 font = pygame.font.SysFont("arial", 16)
 font_height = font.get_linesize()
 #-------------------------------
 
-#----------- 背景设置 ----------
+#----------- initialise background ----------
 resol = (1280,720)
 screen = pygame.display.set_mode(resol, 0 ,32)
 background = pygame.Surface(resol)
 background.fill((0,0,0))
 #------------------------------
 
-#----------- 时间初始化 --------
+#----------- initialise clock --------
 clock = pygame.time.Clock()
 time_passed = 0
 #------------------------------
 
-#----------- 主角单位创建 ----------   单主角游戏
+#----------- initialise the main unit ----------   for now, there is only on controllable unit.
 hero_size = (15,15)
 hero = Pc(hero_size)
 #-------------------------------
 
-#----------- 地图加载 --------------
+#----------- Load map --------------
 my_map = Map(resol)
 block = []
 block_file = open('map_0.txt', 'r')
@@ -59,42 +60,42 @@ for i in block_file.readlines():
 my_map.load_block(block)
 #------------------------------------
 
-#----------- 单位初始化 ------------
+#----------- Initialise the player-control unit ------------
 hero.reset_pos(my_map)
 #------------------------------
 
-#---------- 其余数据初始化 ------------------
+#---------- Initialise anything left ------------------
 flag = True
 #-----------------------------------------
 
-# 循环部分：
+# The main loop：
 while True:
 
-	# 角色参数 update：
+	# Update: basic
 	hero.update_collision(my_map.block)
 	hero.update_according_pos()
 
-	# 获取各种相关数据
+	# Retrive any important information
 	pressed_keys = pygame.key.get_pressed()
 	time_passed = clock.tick(60) / 1000.0
 
-	# 获取 event 状况
+	# Retrive events
 	for event in pygame.event.get():
-		# 关闭
+		# event: closing
 		if event.type == QUIT:
 			exit()
 
-		# 单击按键情况
+		# event: single press
 		if event.type == KEYDOWN:
 			
-			# 处理转向
+			# face turning
 			hero.face_turning(event.key == 97, event.key == 100)
 
-			# 空格按键 event (key = 32)
+			# event: space button  (key = 32)
 			if event.key == 32:
 				hero.space_movement(pressed_keys[K_s])
 
-#			if event.key == 32 and event.mod == 1:
+#			if event.key == 32 and event.mod == 1:   # previous setting
 			if event.key == 107:
 				hero.rush() 
 
@@ -103,22 +104,21 @@ while True:
 				hero.set_spd((0,0))
 
 
-	# 持续按键状态
+	# Event: Holding button
 	hero.float(pressed_keys[K_LSHIFT])
-
-	# 角色运动状态改变
 	hero.movement(pressed_keys[K_a], pressed_keys[K_d])
 	
+	# Update: movement
 	hero.update_jump()
 	physics.gravity(hero, time_passed, g)
 
-	if hero.rush_time: 	# 空中动作是否完成判断，并计算速度变化
+	if hero.rush_time: 	# to check whether any special action in the air is on
 		hero.update_rush(time_passed)
 
-	else:   # 普通运动状态，如果是冲刺，拉索，或其他特殊水平运动，请额外处理
+	else:
 		hero.acceleration(time_passed)
 	
-	# 位移结果 与 碰撞
+	# Calculate: collision and motion
 	hero.update_collision(block)
 	hero.motion(time_passed, my_map.block)
 
