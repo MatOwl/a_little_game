@@ -52,7 +52,7 @@ hero = Pc(hero_size)
 #----------- Load map --------------
 my_map = Map(resol)
 block = []
-block_file = open('map_0.txt', 'r')
+block_file = open('map.txt', 'r')
 
 for i in block_file.readlines():
 	if i: block.append(pygame.Rect(*eval(i)))
@@ -71,15 +71,11 @@ flag = True
 # The main loop：
 while True:
 
-	# Update: basic
-	hero.update_collision(my_map.block)
-	hero.update_according_pos()
-
 	# Retrive any important information
 	pressed_keys = pygame.key.get_pressed()
 	time_passed = clock.tick(60) / 1000.0
 
-	# Retrive events
+	# Retrive events/input
 	for event in pygame.event.get():
 		# event: closing
 		if event.type == QUIT:
@@ -108,22 +104,15 @@ while True:
 	hero.float(pressed_keys[K_LSHIFT])
 	hero.movement(pressed_keys[K_a], pressed_keys[K_d])
 	
-	# Update: movement
-	hero.update_jump()
+	# Update, unit:
+	hero.update_all(my_map, time_passed)
+
+	# Update, physics
 	physics.gravity(hero, time_passed, g)
-
-	if hero.rush_time: 	# to check whether any special action in the air is on
-		hero.update_rush(time_passed)
-
-	else:
-		hero.acceleration(time_passed)
-	
-	# Calculate: collision and motion
-	hero.update_collision(block)
-	hero.motion(time_passed, my_map.block)
 
 	# blit
 	screen.blit(background, (0,0))
+
 	for i in my_map.block:
 		temp = pygame.Surface(i.size)
 		temp.fill((0,200,0))

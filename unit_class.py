@@ -151,6 +151,19 @@ class Pc(Unit):
 		self.drop_time = False   # bool
 		self.float_state = False
 
+	def update_all(self, my_map, time_passed):
+		self.update_collision(my_map.block)
+		self.update_according_pos()
+		self.update_jump()
+
+		if self.rush_time: 	# to check whether any special action in the air is on
+			self.update_rush(time_passed)
+		else:
+			self.acceleration(time_passed)
+
+		self.motion(time_passed, my_map.block)
+
+
 	def update_rush(self, time_passed):
 		self.rush_time -= time_passed
 		if self.rush_time < 0: 
@@ -267,7 +280,16 @@ class Pc(Unit):
 	def float_accelaration(self, g, time):
 		self.speed = Vector2(self.speed.x, min(self.speed.y + g * time * 0.05, 70))
 
+	# fire!!
+	def fire_normal(self):
+		# initialise a bullet
+		bullet_size = ()
+		bullet_life = 4   # unit sec
+		bullet_range = 100   # unit pix
+		bullet = Bullet(bullet_size, self.facing)
 
+
+'''
 class Bullet(Unit):
 
 	def __init__(self, size):
@@ -276,7 +298,17 @@ class Bullet(Unit):
 		self.facing = Vector2(*facing)   # facing is a 2d tuple
 		self.range = 0
 		self.lifetime = 0
+		self.speed = self.facing.normalize() * 500
 		self.damage = 1   # 先不用
 
-	def update_continue(self):   # 消失判定, True: 继续，False，准备删除
+	def update_all(self):
+		if self.update_continue:
+			self.motion
+		else:
+			self.delete()
+'''
+
+	# def update_continue(self):   # 消失判定, True: 继续，False，准备删除
 	# 检查 4 样：碰撞次数、与目标碰撞、range 和 生存时间
+
+	# def delete(self): # delete it from the unit list... or do something like this.
