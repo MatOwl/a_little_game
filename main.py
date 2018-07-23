@@ -79,6 +79,7 @@ while True:
 	# Retrive any important information
 	pressed_keys = pygame.key.get_pressed()
 	time_passed = clock.tick(60) / 1000.0
+	mouse_pos = Vector2(*pygame.mouse.get_pos())
 
 	# Retrive events/input
 	for event in pygame.event.get():
@@ -105,14 +106,26 @@ while True:
 				hero.set_spd((0,0))
 				all_unit = [hero]
 
-			if event.unicode == 'l':
+			if event.unicode == 'j':
 				all_unit.append(hero.fire_normal())
+
+		if event.type == MOUSEBUTTONDOWN:
+
+			if event.button == 1:
+				all_unit.append(hero.fire_normal())
+
+			if event.button == 3:
+				hero.rush()
 
 
 	# Event: Holding button
 	hero.float(pressed_keys[K_LSHIFT])
 	hero.movement(pressed_keys[K_a], pressed_keys[K_d])
 	
+	# Event change in mouse pos
+	facing = (mouse_pos - (hero.pos + hero.size * 0.5)).normalize()
+	hero.set_facing(facing)
+
 	# Update, unit:
 	for i in all_unit:
 		if not i.update_all(my_map, time_passed):

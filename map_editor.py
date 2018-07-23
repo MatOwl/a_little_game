@@ -59,7 +59,7 @@ while True:
 
 		if event.type == KEYDOWN:
 			if event.unicode == 's':
-				file = open('map_0.txt', 'w')
+				file = open('map.txt', 'w')
 				for i in my_map:
 					file.write(str(i) + '\n')
 

@@ -87,6 +87,10 @@ class Unit():
 		# color 是一个 3 元 tuple，RGB 颜色
 		self.color = color
 
+	def set_facing(self, facing):
+		# facing is a 2d tuple
+		self.facing = Vector2(facing)
+
 	
 
 	# 运动
@@ -144,8 +148,8 @@ class Pc(Unit):
 	def __init__(self, size):
 		Unit.__init__(self, size)
 
-		self.rush_state = 0  # rush 一次就减一，落地或者碰墙就回归到3
-		self.rush_time = 3   # unit sec
+		self.rush_state = 0  # rush 一次就减一，落地或者碰墙就回归到10
+		self.rush_time = 10   # unit sec
 		self.jump_state = 1
 		self.drop_state = 1
 		self.drop_time = False   # bool
@@ -205,7 +209,7 @@ class Pc(Unit):
 			collision = rect.collidelist(my_map.block)
 
 	def reset_action_ground(self):   # rush and jump,落地刷新
-		self.rush_state = 3
+		self.rush_state = 10
 		self.jump_state = 10
 		if self.drop_time: self.drop_end()   # drop_state == 0 就是下落中。
 
@@ -257,13 +261,7 @@ class Pc(Unit):
 
 	def rush(self):
 		if self.rush_time == 0 and self.rush_state:
-			if self.facing.x > 0:
-				direction = 1
-			elif self.facing.x < 0:
-				direction = -1
-			else:
-				direction = 0
-			self.speed = Vector2( direction * 1500, 0 )
+			self.speed = self.facing * 1500
 			self.set_color((255,0,0))   # rush 的时候外观改变
 			self.rush_time = 0.1
 			self.rush_state -= 1
