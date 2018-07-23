@@ -60,6 +60,11 @@ for i in block_file.readlines():
 my_map.load_block(block)
 #------------------------------------
 
+#--------- load unit ------------------
+all_unit = [hero]
+#------------------------------------
+
+
 #----------- Initialise the player-control unit ------------
 hero.reset_pos(my_map)
 #------------------------------
@@ -98,6 +103,10 @@ while True:
 			if event.unicode == 'r':
 				hero.reset_pos(my_map)
 				hero.set_spd((0,0))
+				all_unit = [hero]
+
+			if event.unicode == 'l':
+				all_unit.append(hero.fire_normal())
 
 
 	# Event: Holding button
@@ -105,7 +114,9 @@ while True:
 	hero.movement(pressed_keys[K_a], pressed_keys[K_d])
 	
 	# Update, unit:
-	hero.update_all(my_map, time_passed)
+	for i in all_unit:
+		if not i.update_all(my_map, time_passed):
+			all_unit.remove(i)
 
 	# Update, physics
 	physics.gravity(hero, time_passed, g)
@@ -121,12 +132,15 @@ while True:
 	hero_image = pygame.Surface(hero.size.value())
 	hero_image.fill(hero.color)
 	hero.set_image(hero_image)
-	screen.blit(hero.image, hero.pos.value())
+
+	for i in all_unit:
+		screen.blit(i.image, i.pos.value())
 
 	screen.blit( font.render("hit_wall: " + str(hero.contact), True, (0, 0, 0)), (600, 650) )
 	screen.blit( font.render("speed: " + str(hero.speed), True, (0, 0, 0)), (600, 670) )
 	screen.blit( font.render("pos: " + str(hero.pos), True, (0, 0, 0)), (600, 680) )
 	screen.blit( font.render("color: " + str(hero.color), True, (0, 0, 0)), (600, 660) )
+	screen.blit( font.render("Units: " + str(all_unit), True, (0, 0, 0)), (600, 690) )
 
 
 	pygame.display.update()

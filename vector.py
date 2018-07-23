@@ -23,8 +23,9 @@ class Vector2(object):
 	
 	def normalize(self):
 		magnitude = self.get_magnitude()
-		self.x /= magnitude
-		self.y /= magnitude
+		x = self.x / magnitude
+		y = self.y / magnitude
+		return Vector2(x,y)
 	# rhs stands for Right Hand Side
 	def __add__(self, rhs):
 		return Vector2(self.x + rhs.x, self.y + rhs.y)

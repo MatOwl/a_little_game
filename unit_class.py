@@ -163,6 +163,8 @@ class Pc(Unit):
 
 		self.motion(time_passed, my_map.block)
 
+		return True
+
 
 	def update_rush(self, time_passed):
 		self.rush_time -= time_passed
@@ -283,32 +285,54 @@ class Pc(Unit):
 	# fire!!
 	def fire_normal(self):
 		# initialise a bullet
-		bullet_size = ()
-		bullet_life = 4   # unit sec
-		bullet_range = 100   # unit pix
-		bullet = Bullet(bullet_size, self.facing)
+
+		bullet_size = (3,3)
+
+		bullet_image = pygame.Surface(bullet_size)
+		bullet_image.fill((255,255,255))
+		
+		bullet_details = {
+		'range': 400,
+		'lifetime': 4, 
+		'image': bullet_image,
+		'speed': 1000
+		}
+		return Bullet(bullet_size, self.facing.value(), (self.pos + self.size * 0.5).value(), bullet_details)
 
 
-'''
+
 class Bullet(Unit):
 
-	def __init__(self, size):
-		Unit.__init__(self, size, facing)
+	def __init__(self, size, facing, pos, details):
+		# details = {range: , lifetime: , image: }
+
+		Unit.__init__(self, size)
+
+		self.set_pos(pos)
+		self.set_image(details['image'])
 
 		self.facing = Vector2(*facing)   # facing is a 2d tuple
-		self.range = 0
-		self.lifetime = 0
-		self.speed = self.facing.normalize() * 500
+		self.init_pos = self.pos
+		self.range = details['range']
+		self.lifetime = details['lifetime']
+		self.speed = self.facing.normalize() * details['speed']
 		self.damage = 1   # 先不用
 
-	def update_all(self):
-		if self.update_continue:
-			self.motion
-		else:
-			self.delete()
-'''
+	def update_all(self, my_map, time_passed):
+		self.motion(time_passed, my_map.block)
+		
+		return self.update_continue(my_map, time_passed) # True: continue to exist，False，delete
 
-	# def update_continue(self):   # 消失判定, True: 继续，False，准备删除
+
+	def update_continue(self, my_map, time_passed):   
 	# 检查 4 样：碰撞次数、与目标碰撞、range 和 生存时间
+		self.update_collision(my_map.block)
+		contact = False
+		for i in self.contact.keys():
+			contact = self.contact[i] or contact
 
-	# def delete(self): # delete it from the unit list... or do something like this.
+		self.lifetime -= time_passed
+
+		flag = contact or self.lifetime <= 0 or self.range <= (self.pos - self.init_pos).get_magnitude()
+
+		return not flag
